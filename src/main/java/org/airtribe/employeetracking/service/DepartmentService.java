@@ -5,6 +5,7 @@ import org.airtribe.employeetracking.entity.Department;
 import org.airtribe.employeetracking.entity.Project;
 import org.airtribe.employeetracking.mapper.ProjectMapper;
 import org.airtribe.employeetracking.repository.DepartmentRepository;
+import org.airtribe.employeetracking.repository.ProjectRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -20,6 +21,9 @@ public class DepartmentService {
 
     @Autowired
     private ProjectMapper projectMapper;
+
+    @Autowired
+    private ProjectRepository projectRepository;
 
     // Get all departments
     public List<Department> getAllDepartments() {
@@ -58,5 +62,9 @@ public class DepartmentService {
             return department.getProjectList().stream().map(projectMapper::toDto).collect(Collectors.toList());
         }
         return null;
+    }
+
+    public Double getTotalBudgetForDepartment(int deptId) {
+        return projectRepository.getTotalBudgetByDepartment(deptId);
     }
 }

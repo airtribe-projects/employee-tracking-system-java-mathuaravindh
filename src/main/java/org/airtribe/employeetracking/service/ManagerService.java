@@ -2,12 +2,16 @@ package org.airtribe.employeetracking.service;
 
 import org.airtribe.employeetracking.dto.ManagerDTO;
 import org.airtribe.employeetracking.entity.Manager;
+import org.airtribe.employeetracking.entity.User;
 import org.airtribe.employeetracking.mapper.ManagerMapper;
 import org.airtribe.employeetracking.repository.ManagerRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -55,5 +59,15 @@ public class ManagerService {
     // Delete a manager by ID
     public void deleteManager(int id) {
         managerRepository.deleteById(id);
+    }
+
+    public Manager getManagerByAuthentication(Authentication authentication) throws IllegalArgumentException
+    {
+        JwtAuthenticationToken jwtToken = (JwtAuthenticationToken) authentication;
+        Map<String, Object> claims = jwtToken.getToken().getClaims();
+        String userEmail = (String) claims.get("email");
+        Manager managerAu =  managerRepository.findByEmail(userEmail)
+                .orElseThrow(()-> new IllegalArgumentException("Manager not found with Email: " + userEmail));
+        return managerAu;
     }
 }

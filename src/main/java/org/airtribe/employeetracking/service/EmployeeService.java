@@ -1,6 +1,7 @@
 package org.airtribe.employeetracking.service;
 
 import org.airtribe.employeetracking.dto.EmployeeDTO;
+import org.airtribe.employeetracking.entity.Department;
 import org.airtribe.employeetracking.entity.Employee;
 import org.airtribe.employeetracking.mapper.EmployeeMapper;
 import org.airtribe.employeetracking.repository.DepartmentRepository;
@@ -14,6 +15,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -40,6 +42,10 @@ public List<EmployeeDTO> getAllEmployees()
 {
     return employeeRepository.findAll().stream().map(employeeMapper::toDto).collect(Collectors.toList());
 }
+
+    public Optional<EmployeeDTO> getEmployeeById(int id) {
+        return Optional.ofNullable(employeeMapper.toDto(employeeRepository.findById(id).get()));
+    }
 
     public Employee updateEmployee(int id, Employee updatedEmployee) {
         return employeeRepository.findById(id)
@@ -70,5 +76,13 @@ public List<EmployeeDTO> getAllEmployees()
         Employee employeeAu = employeeRepository.findByEmail(userEmail)
                 .orElseThrow(()-> new IllegalArgumentException("Employee not found with Email: " + userEmail));
         return employeeAu;
+    }
+
+    public List<Employee> getEmployeesWithoutProjects() {
+        return employeeRepository.findEmployeesWithoutProjects();
+    }
+
+    public List<Employee> getEmployeesByProject(int projectId) {
+        return employeeRepository.findEmployeesByProjectId(projectId);
     }
 }

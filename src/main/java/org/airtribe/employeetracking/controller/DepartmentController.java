@@ -20,13 +20,14 @@ public class DepartmentController {
 
     // Get all departments
     @GetMapping("/departments")
+    @PreAuthorize("@securityService.hasAccessToManagerEndpoint(authentication)")
     public List<Department> getAllDepartments() {
         return departmentService.getAllDepartments();
     }
 
     // Get a department by ID
     @GetMapping("/departments/{id}")
-    @PreAuthorize("hasRole('ROLE_MANAGER')")
+    @PreAuthorize("@securityService.hasAccessToManagerEndpoint(authentication)")
     public ResponseEntity<Department> getDepartmentById(@PathVariable int id) {
         return departmentService.getDepartmentById(id)
                 .map(ResponseEntity::ok)
@@ -35,7 +36,7 @@ public class DepartmentController {
 
     // Create a new department
     @PostMapping("/departments")
-    //@PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("@securityService.hasAccessToManagerEndpoint(authentication)")
     public Department createDepartment(@RequestBody Department department) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         System.out.println("Controller User: " + authentication.getName());
@@ -45,6 +46,7 @@ public class DepartmentController {
 
     // Update an existing department
     @PutMapping("/departments/{id}")
+    @PreAuthorize("@securityService.hasAccessToManagerEndpoint(authentication)")
     public ResponseEntity<Department> updateDepartment(
             @PathVariable int id,
             @RequestBody Department updatedDepartment
@@ -58,13 +60,21 @@ public class DepartmentController {
 
     // Delete a department
     @DeleteMapping("/departments/{id}")
+    @PreAuthorize("@securityService.hasAccessToManagerEndpoint(authentication)")
     public ResponseEntity<Void> deleteDepartment(@PathVariable int id) {
         departmentService.deleteDepartment(id);
         return ResponseEntity.noContent().build();
     }
 
     @GetMapping("/departments/{id}/projects")
+    @PreAuthorize("@securityService.hasAccessToManagerEndpoint(authentication)")
     public List<ProjectDTO> getDepartmentProjectsById(@PathVariable int id) {
         return departmentService.getDepartmentProjectsById(id);
+    }
+
+    @GetMapping("/departments/{deptId}/budget")
+    @PreAuthorize("@securityService.hasAccessToManagerEndpoint(authentication)")
+    public Double getTotalBudget(@PathVariable int deptId) {
+        return departmentService.getTotalBudgetForDepartment(deptId);
     }
 }
